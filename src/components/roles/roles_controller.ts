@@ -1,19 +1,22 @@
+import { Response, Request } from 'express';
+import { RolesService } from './roles_service';
+import { BaseController } from '../../utils/base_controller';
 import { Rights } from '../../utils/common';
-export class RoleController {
-  public addHandler() {
-    // addHandler
+export class RoleController extends BaseController {
+  public async addHandler(req: Request, res: Response): Promise<void> {
+    console.log('BODY RECEIVED:', req.body);
+    const role = req.body;
+    const service = new RolesService();
+    const result = await service.create(role);
+    res.status(result.statusCode as number).json(result);
+    return;
   }
-  public getAllHandler() {
-    // getAllHandler
-  }
-  public getDetailsHandler() {
-    // getDetailsHandler
-  }
-  public async updateHandler() {
-    // updateHandler
-  }
-  public async deleteHandler() {
-    // deleteHandler
+  public async getAllHandler(req: Request, res: Response) {}
+  public async getOneHandler(req: Request, res: Response) {}
+  public async updateHandler(req: Request, res: Response) {}
+  public async deleteHandler(req: Request, res: Response) {}
+  public async getDetailsHandler(req: Request, res: Response) {
+    // Add your logic here to fetch and return the role details
   }
 }
 

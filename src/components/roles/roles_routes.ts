@@ -1,5 +1,27 @@
 import { Express } from 'express';
-import { RoleController } from './roles_controller';
+import { RoleController, RolesUtil } from './roles_controller';
+import { validate } from '../../utils/validator';
+import { body } from 'express-validator';
+const validRoleInput = [
+  body('name').trim().notEmpty().withMessage('It should berequired'),
+  body('description')
+    .isLength({ max: 200 })
+    .withMessage('It has maximum limit of 200 characters'),
+  body('rights').custom((value: string) => {
+    const accessRights = value?.split(',');
+    if (accessRights?.length > 0) {
+      const validRights = RolesUtil.getAllPermissionsFromRights();
+      const areAllRightsValid = accessRights.every((right) =>
+        validRights.includes(right)
+      );
+      if (!areAllRightsValid) {
+        throw new Error('Invalid permission');
+      }
+    }
+    return true; // Validation passed
+  }),
+];
+
 export class RoleRoutes {
   private baseEndPoint = '/api/roles';
   constructor(app: Express) {
@@ -7,11 +29,11 @@ export class RoleRoutes {
     app
       .route(this.baseEndPoint)
       .get(controller.getAllHandler)
-      .post(controller.addHandler);
+      .post(validate(validRoleInput), controller.addHandler);
     app
       .route(this.baseEndPoint + '/:id')
-      .get(controller.getDetailsHandler)
-      .put(controller.updateHandler)
+      .get(controller.getOneHandler)
+      .put(validate(validRoleInput), controller.updateHandler)
       .delete(controller.deleteHandler);
   }
 }

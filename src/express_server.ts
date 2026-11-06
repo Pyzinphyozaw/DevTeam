@@ -10,6 +10,7 @@ export class ExpressServer {
     const port = this.server_config.port ?? 3000;
     // initialize express app
     const app = express();
+    app.use(express.json());
     app.get('/ping', (req, res) => {
       res.send('pong');
     });
@@ -19,8 +20,9 @@ export class ExpressServer {
     }
 
     ExpressServer.server = app.listen(port, () => {
-      console.log(`Server is running on port ${port} with pid =
-${process.pid}`);
+      console.log(
+        `Server is running on port ${port} with pid = ${process.pid}`
+      );
     });
   }
   //close the express server for safe on uncaughtException
